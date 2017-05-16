@@ -21,49 +21,87 @@
 ```js
 function multiline_buffered(content){ "use strict";
   var  buffer                  = []
-      ,REGEX_EXTRACT_MULTILINE = /^\s*function\s*(\s*)\s*{\s*\/\*(.*)\*\/\s*\}\s*$/im
+      ,REGEX_EXTRACT_MULTILINE = /\/\*\+(.+)\+/i
       ;
 
-  //private functions
-  function append_string(content){    buffer.push(str);                                       }   //plain text
-  function append_multiline(content){ content = content.toString().replace(/function/ig,"");      //multiline
-                                      append_string(content);                                 }
-  function append_buffer(content){    buffer = [].concat(buffer, content);                    }   //buffer
+  function uncomment(content){ //extract multi-line string (also fix Chrome line-breaks identify bug in console).
+    content = content.toString().replace(/\n/g, "##N##").replace(/\r/g, "##R##");
+    content = content.match(REGEX_EXTRACT_MULTILINE);
+    if(null === content || "undefined" === typeof content[1]) return undefined; //this means that at the end we need to filter-out undefined-s
+    content = content[1];
+    content = content.replace(/##R##/g, "\r").replace(/##N##/g, "\n");
+    return content;
+  }
 
-  //main usage (will be made public next)
   function append(content){
-    if(     "string"   === typeof content)                            append_string(   content);
-    else if("function" === typeof content)                            append_multiline(content);
-    else if(  "object" === typeof content
-            &&"array"  === content.constructor.name.toLowerCase())    append_buffer(   content);
+    var   is_string      = "string"      === typeof content
+         ,is_multiline   = "function"    === typeof content  &&  "function" === typeof content.toString
+         ,is_buffer      = "object"      === typeof content  &&  true       === /array/i.test(content)
+
+         if(true === is_string)      buffer.push(content);
+    else if(true === is_multiline)   buffer.push(uncomment(content));
+    else if(true === is_buffer)      buffer.concat(content);
+
     return buffer;
   }
 
-  function toString(separator, is_return_buffer_too){
-    var result;
-
-    separator             = "undefined" === separator ? "" : separator; //optional (when not defined, normalised to empty string)
-    is_return_buffer_too  = true === is_return_buffer_too;              //optional (when not defined, normalised to false)
-
-    result = buffer.join(separator);
-
-    if(true === is_return_buffer_too)   result.buffer = buffer;     //object-oriented, puts buffer as object's attribute.
-    else                                buffer = undefined;         //cleanup (usually at the end of append chain when got string result).
-
-    return result;
+  function toString(separator){
+    separator = "string" === typeof separator ? separator : "";       //normalise (default: empty string)
+    return buffer
+            .filter(function(item){return "string" === typeof item;}) //filter-out undefined-s
+            .join(separator)
+            ;
   }
 
-  //public access to methods (and internal buffer)
-  buffer.append   = append;  
-  buffer.toString = toString;
+  buffer.append   = append;     //made public
+  buffer.toString = toString;   //made public
 
-  append(content);  //(optional) start with content: `multiline_buffered(..content..)`.  Same as `multiline_buffered().append(..content..)`.
+  append(content);              //init with value (optional. if undefineds - does nothing)
 
   return buffer;
 }
+
+
+//a little tryout
+multiline_buffered(function(){/*+hello
+                                               world
+!
++*/})
+.append("and 10x for all the ").append("fish")
+.toString()
+
+/* should print:
+"hello
+                                               world
+!
+and 10x for all the fish"
+*/
 ```
 
 <hr/>
+
+<ul><li>
+<h2>Wow! Amm..Again, How To <em>Multi-Line?</em></h2>
+<h3>From the code below: <code>multiline_buffered(function(){/*+MULTILINE_CONTENT+*/})</code></h3>
+<h4>Notice the <code>/*+</code> marking start and <code>+*/</code> marking the end. It is a little different than the <a href="https://github.com/sindresorhus/multiline">original multiline code</a>, but allows a little faster implementation (less complex regular-expression matching).
+
+Have you notice that <code>##R##</code> and <code>##N##</code>?
+
+Chrome has a bug with internal escaping of anonymous functions, from within the developer-console,
+especially multi-line onces, with comments having line-feed characters.
+
+since it is internal, you might not be interested knowing about it, but here it is anyway...
+
+<img alt="" src="resources/chrome_multiline_regex_bug__workaround1.png"/>
+
+but if you'll flat (temporary) the line-feed characters it will work just fine..
+
+<img alt="" src="resources/chrome_multiline_regex_bug__workaround2.png"/>
+</li>
+
+<hr/>
+
+
 
 <h3>Usage <sub>By Examples</sub></h3>
 
@@ -82,8 +120,8 @@ multiline_buffered("Hello World!").toString();
 multiline classic behavior. 
 
 ```js
-multiline_buffered(function(){/*Hello
- World!*/).toString();
+multiline_buffered(function(){/*+Hello
+ World!+*/).toString();
 ```
 
 <pre>
@@ -116,13 +154,13 @@ chain strings to generate an easy wrap.
 multiline_buffered()
 .append("(function(window, document){")
 .append(function(){
-/*
+/*+
   var me_so_happpppppy = ":)";
 
   console.log("hello");
   console.log("world!");
 
-*/
++*/
 })
 .append("}(self, self.document));")
 .toString();
