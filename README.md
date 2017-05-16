@@ -11,14 +11,13 @@
 <h3>Developer Notes</h3>
 <ul>
 <li><h4><strong>Memory Efficient</strong>: Relaying on native <code>Array</code> object, with <em>object-oriented</em> properties.</h4></li>
-<li><h4>Multi-Line uses a multi-line comment, which is unrestricted by nature, wrapped with a function. The functions's content (its <code>.toString</code> (a prototype from <code>Function</code>) allows accessing the comment - and grabbing the content without the <code>/*</code> and <code>*/</code> wrapping - pretty awesome! <sup>right?</sup>,
-thank this repository for the idea: <a href="https://github.com/sindresorhus/multiline">github.com/sindresorhus/multiline</a>
-<strong><a href="https://github.com/sindresorhus/multiline/issues/35">I did!</a></strong>.</h4></li>
+<li><h4>Multi-Line uses a multi-line comment, which is unrestricted by nature, wrapped with a function. The functions's content (its <code>.toString</code> (a prototype from <code>Function</code>) allows accessing the comment - and grabbing the content without the <code>/*</code> and <code>*/</code> wrapping - pretty awesome! <sup>right?</sup>, thank this repository for the idea: <a href="https://github.com/sindresorhus/multiline">github.com/sindresorhus/multiline</a> &nbsp; <strong><a href="https://github.com/sindresorhus/multiline/issues/35">I did!</a></strong>.</h4></li>
 <li><h4>When calling the method the system does create a new object, and array (internally) which, due to shorthand does not required you to use the <code>new</code> syntax :]</h4></li>
 </ul>
 
 <hr/>
-<h3>The Code <sub>in-case you don't feel like opening <code>multiline_buffered.js</code> above..</sub></h3>
+<h3>The Code. <sub>Just in-case you don't feel like opening <code>multiline_buffered.js</code> above..</sub></h3>
+
 ```js
 function multiline_buffered(content){ "use strict";
   var  buffer                  = []
@@ -69,24 +68,33 @@ function multiline_buffered(content){ "use strict";
 <h3>Usage <sub>By Examples</sub></h3>
 
 non-sense (sanity) usage: <em>add string, get it back</em>.
+
 ```js
 multiline_buffered("Hello World!").toString();
 ```
+
 <pre>
 1  |Hello World!
 </pre>
 
+<hr/>
+
 multiline classic behavior. 
+
 ```js
 multiline_buffered(function(){/*Hello
  World!*/).toString();
 ```
+
 <pre>
 1  |Hello
 2  | World!
 </pre>
 
+<hr/>
+
 chain strings together <sup>significantly <strong>faster</strong> than using the <em><code>+</code></em> operand</sup>.
+
 ```js
 multiline_buffered().append("hello").append(" ").append("world!").toString();
 
@@ -94,14 +102,17 @@ multiline_buffered().append("hello").append(" ").append("world!").toString();
 
 multiline_buffered("hello").append(" ").append("world!").toString(); //'save' one append by starting with some data
 ```
+
 <pre>
 1  |Hello World!
 </pre>
 
+<hr/>
+
 chain strings to generate an easy wrap.
 <sup><em>Example: an easy closure wrap to keeps your DOM clean.</em></sup>
 
-```
+```js
 multiline_buffered()
 .append("(function(window, document){")
 .append(function(){
@@ -114,6 +125,7 @@ multiline_buffered()
 })
 .append("}(self, self.document));")
 .toString();
+```
 
 <pre>
 1  |(function(window, document){
