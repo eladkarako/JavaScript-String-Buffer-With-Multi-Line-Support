@@ -121,6 +121,7 @@ multiline_buffered()
 
   console.log("hello");
   console.log("world!");
+
 */
 })
 .append("}(self, self.document));")
@@ -129,10 +130,13 @@ multiline_buffered()
 
 <pre>
 1  |(function(window, document){
-2  |  var me_so_happpppppy = ":)";
-3  |  console.log("hello ");
-4  |  console.log("world!");
-5  |}(self, self.document));
+2  |
+3  |  var me_so_happpppppy = ":)";
+4  |
+5  |  console.log("hello ");
+6  |  console.log("world!");
+7  |
+8  |}(self, self.document));
 </pre>
 
 <hr/>
