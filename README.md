@@ -1,6 +1,18 @@
 
 <h1><img alt="" src="resources/logo.png"/></h1>
 
+<hr/>
+
+<strong>Note</strong> that the multiline comment has a little plus after the <code>*</code>
+<sub>Because: It makes a more efficient "finding" Regular-Expression</sub>
+
+```js
+/*+Hello
+World!+*/
+```
+
+<hr/>
+
 <ul>
 <li><h3><strong>Significantly Faster</strong>: <em>Much</em> Better than using the <code>+</code> operand.</h3></li>
 <li><h3><strong>Easy Multi-Line Append</strong>: Easy enter anything, no escaping needed, full Unicode support.</h3></li>
@@ -199,6 +211,12 @@ function multiline(content){ "use strict";
 // 1   |multiline(function(){/*+Hello
 // 2   |World!+*/});
 // OUT |"Hello\nWorld !"
+```
+
+or the minified version that only takes less than 1KB! (200bytes)
+
+```js
+function multiline(content){try{content=content.toString().replace(/\n/g,"##N##").replace(/\r/g,"##R##").match(/\/\*\+(.+)\+/i)[1].replace(/##N##/g,"\n").replace(/##R##/g,"\r");}catch(err){content=undefined;}return content;}
 ```
 
 <hr/>
