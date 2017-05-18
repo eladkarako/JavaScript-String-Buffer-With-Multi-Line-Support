@@ -192,6 +192,8 @@ multiline_buffered()
 <hr/>
 
 If you just want to use <code>multiline</code> without the buffer,
+use <code>multiline.js</code> (or <code>multiline.min.js</code>)
+
 here is a little more efficient code:
 
 ```js 
@@ -217,6 +219,18 @@ or the minified version that only takes less than 1KB! (200bytes)
 
 ```js
 function multiline(content){try{content=content.toString().replace(/\n/g,"##N##").replace(/\r/g,"##R##").match(/\/\*\+(.+)\+/i)[1].replace(/##N##/g,"\n").replace(/##R##/g,"\r");}catch(err){content=undefined;}return content;}
+```
+
+<hr/>
+
+Naturally there are cases where all you want to have is a long string, and the \r \n are simply for keeping
+things more readble for you,
+in that case use <code>line.js</code> (or <code>line.min.js</code>) that does not preserve line-feed characters and only creates a long string, keep in mind to have spaces where you need them, it is very useful if you want to include " or ' characters without the need to escape them! :]
+
+Here is the code too...
+
+```js
+function line(content){try{content=content.toString().replace(/[\r\n]+/g,"").match(/\/\*\+(.+)\+/i)[1];}catch(err){content=undefined;}return content;}
 ```
 
 <hr/>
